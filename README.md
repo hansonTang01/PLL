@@ -14,10 +14,10 @@ This repo implements PrunedLandmarkLabeling that calculates the shortest distanc
 - pandas
 ### 模块
 本仓库分为以下五个模块：
-- utils.py：该文件包含了生成order、BFS构建label、计算俩跳计数、输出结到excel表等所有的函数。
-- BFS.py: 给定一个order，基于该order进行BFS，注意：此order可以是之前基于degree或者其他centrality得到的order，也可以是user-define的。
-- gen_order.py: 选择一种centrality(degree,betweenness or hop_count)，给出节点的order
-- script.py: 将所有流程聚在一起的脚本，一键运行
+- utils.py：该文件包含了生成order、BFS构建label、俩跳计数等所有工具函数。
+- BFS.py: 给定一个order，基于该order进行BFS
+- gen_order.py: 选择一种centrality，计算出order
+- script.py: 将所有流程聚在一起，一键运行
 - dataset文件夹： 数据集，包含了几个部分：
   - excel：结果转换为excel表存放在这里面
   - hop_count: 俩跳计数的结果放在里面
@@ -29,19 +29,19 @@ This repo implements PrunedLandmarkLabeling that calculates the shortest distanc
 ```bash
 python script.py -i [input_file]
 e.g: python script.py -i macau
-# 完成从基于各种策略生成order，到BFS，到将结果输出到excel的所有流程
+# 最常用，完成从基于各种策略生成order，到BFS，到将结果输出到excel的所有流程
 ```
 
 **gen_order.py**
 ```bash
 python gen_order.py -i [input_file] -m mode
 e.g: python gen_order.py -i macau -m degree
-# degree可以换成其他策略
+# 基于某种策略计算order，degree可以换成其他策略
 ```
 
 **BFS.py**
 ```bash
 python BFS.py -i [input_file] -m [mode]
 e.g: python BFS.py -i macau -m degree
-# degree可以换成其他策略
+# 基于某种策略进行order，mode如果为user_define,则会取./dataset/order/xxx_user_define_order.txt的文件内的order，该文件内的order由用户定义并输入
 ```
