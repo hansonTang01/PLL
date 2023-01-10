@@ -5,12 +5,20 @@ import numpy as np
 from random import randint
 from numba import njit
 import pandas as pd
+import networkit as nk
 max_length = 999999999
 
 def write_2_hop_count(map_file_name, hop_count):
     fileName = "dataset/hop_count/"+ map_file_name+"_hop_count.txt"
     f = open(fileName, 'w')
     f.write(str(list(hop_count)))
+    f.close()
+
+def write_betweenness(map_file_name, betweenness):
+    fileName = "dataset/betweenness/"+ map_file_name+"_betweenness.txt"
+    f = open(fileName, 'w')
+    # betweenness_list = [betweenness[i] for i in range(len(betweenness))]
+    f.write(str(betweenness))
     f.close()
 
 def write_order(map_file_name, vertex_order, mode):
@@ -44,7 +52,7 @@ def load_order(map_file_name, mode):
 
 # 使用networkx读入图
 def read_graph(map_file_name):
-    print("\n************Read Graph*************")
+    print(f"\n************Read {map_file_name}*************")
     G = nx.DiGraph()
     f = open("dataset/map_file/" + map_file_name, 'r')
     data = f.readlines()
@@ -53,9 +61,9 @@ def read_graph(map_file_name):
         if (idx < 2):
             continue
         src, dest, dist, is_one_way = lines.split(" ")
-        G.add_weighted_edges_from([(int(src), int(dest), int(dist))])
+        G.add_weighted_edges_from([(int(src), int(dest), float(dist))])
         if (int(is_one_way) == 0):
-            G.add_weighted_edges_from([(int(dest), int(src), int(dist))])
+            G.add_weighted_edges_from([(int(dest), int(src), float(dist))])
     # 输出节点和边的个数
     print("Finish Reading Graph!")
     print(f"nodes:{len(G.nodes())}   edges:{len(G.edges())}")
@@ -115,12 +123,30 @@ def gen_degree_base_order(G):
     vertex_order = generate_order_for_BFS(nodes_list, G)
     return vertex_order
 
-def gen_betweeness_base_order(G):
-    nodes_list = nx.betweenness_centrality(G, weight="weight")
-    nodes_list = np.array(sorted(nodes_list.items(), key=lambda item:item[1], reverse = True))
+def gen_betweeness_base_order(G, map_file_name):
+    g_nkit = nx2nkit(G)
+    # print(g_nkit)
+    bet_raw = nk.centrality.Betweenness(g_nkit,normalized=True).run()
+    betweenness = bet_raw.scores()
+    # nodes_list = nx.betweenness_centrality(G, normalized = True, weight="weight")
     # print(nodes_list)
+    write_betweenness(map_file_name, betweenness)
+    nodes_list = bet_raw.ranking()
     vertex_order = generate_order_for_BFS(nodes_list, G)
     return vertex_order
+
+def nx2nkit(g_nx):
+    
+    node_num = g_nx.number_of_nodes()
+    g_nkit = nk.Graph(directed=True, weighted = True)
+    
+    for i in range(node_num):
+        g_nkit.addNode()
+    
+    for e1,e2 in g_nx.edges():
+        g_nkit.addEdge(e1,e2,w=g_nx[e1][e2]['weight'])
+        
+    return g_nkit
 
 @njit
 def gen_2_hop_base_order(nNodes, order2index, index: np.ndarray, vertex_order):

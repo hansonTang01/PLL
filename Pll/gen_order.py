@@ -4,14 +4,14 @@ import getopt
 import sys
 
 # 根据输入的mode采取不同的策略构建节点的order
-def gen_order( G, mode = "degree", nNodes = 0, order2index = [], index = [], vertex_order_bet = []):
+def gen_order( G, mode = "degree", nNodes = 0, order2index = [], index = [], vertex_order_bet = [], map_file_name = ''):
     start = time.perf_counter()
     if (mode == "degree"):
         print("\n*************Degree****************")
         vertex_order = gen_degree_base_order(G)
     if (mode == "betweenness"):
         print("\n*************Betweenness***********")
-        vertex_order = gen_betweeness_base_order(G)
+        vertex_order = gen_betweeness_base_order(G, map_file_name)
     if (mode == "hop_count"):
         print("\n*************2-hop*****************")
         vertex_order, hop_count = gen_2_hop_base_order(nNodes, order2index, index, vertex_order_bet)

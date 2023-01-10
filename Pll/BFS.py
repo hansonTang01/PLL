@@ -25,7 +25,7 @@ if __name__== "__main__":
     map_file_name, mode = fetch_map_name()
     G = read_graph(map_file_name)
     order = load_order(map_file_name, mode)
-    _,_ = build_index(G, vertex_order= order)
+    _,_,_ = build_index(G, vertex_order= order)
 
 
     
